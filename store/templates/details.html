@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-4" style="margin-bottom: 25px">
+                <div class="w3-card" style="width:92%;max-width:300px;">
+                    <img src="{% static 'img/empty.png' %}" alt="Avatar" style="width:100%;opacity:0.85">
+                    <div class="w3-container">
+                        <h4><b>{{ book.title }}</b></h4>
+                        <p>{{ book.author }}</p>
+                        <p>{{ reviews.count }} Reviews</p>
+                    </div>
+                </div>
+                <div>
+                    {% if form %}
+                        <h4>Have you read this book? Post a review</h4>
+                        <form class="form-inline" method="POST" action="{% url 'book_details' book.pk %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <input type="text" name="text" class="form-control">
+                            </div>
+                            <input class="btn btn-primary" type="submit" value="Leave review">
+                        </form>
+                    {% endif %}
+                </div>
+                <div style="margin-top: 20px">
+                    {% if reviews %}
+                        {% for review in reviews %}
+                            {{ review.text }}
+                            <div>
+                                - {{ review.user.username }} on  {{ review.publish_date }}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>There is no review for this book</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-8">
+                <h2 class="text-success">You are showing from this place</h2>
+                <div id="map"></div>
+                <script>
+                  function initMap() {
+                    var uluru = {lat: {{ ip.latitude }}, lng: {{ ip.longitude }}};
+                    var map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 8,
+                        center: uluru,
+                        mapTypeId: 'terrain'
+                    });
+                    map.setTilt(45);
+                    var marker = new google.maps.Marker({
+                        position: uluru,
+                        map: map
+                    });
+                  }
+                </script>
+                <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAr4mVMRysq6L3KDKx2Ch8SNM7uoLBdAls&callback=initMap"
+                type="text/javascript"></script>
+            </div>
+        </div>
+    </div>
+{% endblock %}
